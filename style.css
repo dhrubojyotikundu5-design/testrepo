@@ -1,0 +1,85 @@
+# Northeast India Environmental Risk Assessment — GitHub Pages
+
+A static GitHub Pages application that runs the supplied scikit-learn `RandomForestClassifier` directly in the browser.
+
+## What is included
+
+```text
+.
+├── index.html
+├── style.css
+├── script.js
+├── README.md
+├── data/
+│   └── districts.json
+└── model/
+    ├── model.json
+    ├── model_metadata.json
+    └── README.md
+```
+
+The original `random_forest_risk_model.pkl` is not needed by the website. GitHub Pages cannot execute Python/scikit-learn, so the supplied model was converted into a browser-readable JSON representation.
+
+## Model
+
+- Type: `RandomForestClassifier`
+- Trees: 300
+- Input features: 148
+- Classes: 0 and 1
+- Criterion: Gini
+- Class weight: balanced
+- Max features: sqrt
+- Minimum samples per leaf: 2
+- Random state: 42
+
+The browser implementation traverses every decision tree and averages the leaf class probabilities, matching the behavior of `RandomForestClassifier.predict_proba()` for the exported tree structure.
+
+## Deploy to GitHub Pages
+
+1. Create a new GitHub repository, for example `northeast-risk-assessment`.
+2. Upload the contents of this folder to the repository root.
+3. Commit to the default branch.
+4. Open **Settings → Pages**.
+5. Under **Build and deployment**, choose **Deploy from a branch**.
+6. Select your default branch and `/ (root)`.
+7. Save.
+8. Wait for GitHub Actions/Pages to publish the site.
+
+Your URL will normally be:
+
+`https://YOUR-USERNAME.github.io/YOUR-REPOSITORY/`
+
+## Important GitHub Pages detail
+
+The app uses relative paths:
+
+- `model/model.json`
+- `data/districts.json`
+
+Do not change these paths unless you also update `script.js`.
+
+## Local testing
+
+Do not open `index.html` with `file://` because browsers commonly block `fetch()` for local files. Use a local HTTP server instead.
+
+For Python:
+
+```bash
+python -m http.server 8000
+```
+
+Then open:
+
+`http://localhost:8000/`
+
+## Model/data caveat
+
+The uploaded model contains some unusually long categorical feature names, including apparent source-data contamination in a few soil/vegetation categories. The UI exposes the clean, usable categories plus `Unknown`; the feature vector itself is constructed strictly from the model's saved `feature_names` and preserves the original 148-column order.
+
+## Reproducibility
+
+The model conversion was generated from the supplied `random_forest_risk_model.pkl`. The original pickle can be retained separately for Python-side reproducibility, but it should not be loaded in the browser.
+
+## Security/privacy
+
+Because the model runs entirely in the browser, form inputs are not sent to a server by this project. If analytics or an API is added later, update the privacy notice accordingly.
